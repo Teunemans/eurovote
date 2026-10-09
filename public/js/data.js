@@ -26,10 +26,23 @@ export function flag(iso2) {
 }
 
 // Combines the vote from HowTheyVote with the party list from the European Parliament.
+// Finds an MEP's national party on a given day (YYYY-MM-DD) in parties.json.
+// Each MEP has a list of [party id, from, until] periods, because some switch party.
+export function partyOn(parties, mepId, day) {
+  const entry = parties?.meps?.[String(mepId)];
+  if (!entry) return null;
+  if (!Array.isArray(entry)) return entry.party ? { name: entry.party, short: entry.short || entry.party } : null; // older file format
+  const valid = entry.filter(([, from, until]) => (!from || from <= day) && (!until || day <= until));
+  // No period on that exact day (e.g. data gaps): use the most recent one.
+  const [orgId] = (valid.length ? valid : entry).at(-1);
+  return parties.orgs?.[orgId] || null;
+}
+
 export function buildMembers(vote, parties, htvBase = 'https://howtheyvote.eu') {
-  const partyMap = parties?.meps || {};
+  const day = String(vote.timestamp).slice(0, 10);
   return vote.member_votes.map(({ member, position }) => {
-    const partyName = partyMap[String(member.id)]?.party || null;
+    const party = partyOn(parties, member.id, day);
+    const partyName = party?.name || null;
     return {
       id: member.id,
       name: member.full_name,
@@ -40,6 +53,7 @@ export function buildMembers(vote, parties, htvBase = 'https://howtheyvote.eu') 
         ? { code: member.group.code, short: member.group.short_label || member.group.code, label: member.group.label }
         : { code: 'UNKNOWN', short: 'Unknown', label: 'Unknown group' },
       party: partyName,
+      partyShort: party?.short || null,
       // A party name can exist in two countries, so the key includes the country.
       partyKey: partyName ? `${member.country.code}|${partyName}` : `${member.country.code}|?`,
       position,

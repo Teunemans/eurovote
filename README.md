@@ -97,12 +97,12 @@ All the keyboard code is in `public/js/keys.js`. It has a list called `COMMANDS`
 Browser (public/)  ──►  HowTheyVote.eu API             (votes, MEPs, groups, countries)
                    └─►  public/data/parties.json       (national party of each MEP)
                               ▲
-     scripts/update-parties.mjs  ◄──  europarl.europa.eu MEP lists
+     scripts/update-parties.mjs  ◄──  EP Open Data API (data.europarl.europa.eu)
      (run by GitHub Actions daily, and by server.js on your computer)
 ```
 
 - **The browser calls HowTheyVote.eu directly.** Their API allows other websites to use it (it sends the `Access-Control-Allow-Origin: *` header, CORS).
-- **The EP's MEP list can't be read by a browser from another website** (no CORS header), so `scripts/update-parties.mjs` downloads it ahead of time and saves the result as a plain JSON file next to the site.
+- **The EP's data can't be read by a browser from another website** (no CORS header), so `scripts/update-parties.mjs` downloads it ahead of time from the EP's [Open Data API](https://data.europarl.europa.eu/en/developer-corner/opendata-api) and saves it as a plain JSON file next to the site. For every MEP it stores which party they belonged to, from when until when. That way a vote from 2025 shows the party an MEP had *then*, even if they switched later. If the API is down, the script falls back to the MEP lists on europarl.europa.eu, which have no dates.
 - **`server.js`** is only for running the site on your own computer. It serves the files in `public/` and refreshes `parties.json` when it's missing or more than a day old.
 - **`.github/workflows/deploy.yml`** (a copy is kept in `scripts/deploy-workflow.yml`) publishes `public/` on GitHub Pages and refreshes the party list every day.
 - **`public/js/data.js`** does the counting: filtering, totals per group/country/party, and finding "rebels".
@@ -124,7 +124,7 @@ Browser (public/)  ──►  HowTheyVote.eu API             (votes, MEPs, group
 - National parties come from the EP's list of current MEPs (plus the list of MEPs who left). If someone isn't on either list, they show up as "Unknown party", and the party chart tells you how many MEPs that affects.
 - If the EP's party list can't be downloaded, the app still works, but without the party filter.
 - Every visitor's browser loads data from HowTheyVote.eu. If the site gets a lot of visitors, let the HowTheyVote team know (and always credit them).
-- The EP's party list is downloaded ahead of time, so a change of party shows up after the next daily refresh.
+- The party list is downloaded ahead of time, so a change of party shows up after the next daily refresh.
 
 Data: [HowTheyVote.eu](https://howtheyvote.eu) (open data, please credit them when you share) and the [European Parliament](https://www.europarl.europa.eu/meps/en/full-list).
 
@@ -133,5 +133,5 @@ Data: [HowTheyVote.eu](https://howtheyvote.eu) (open data, please credit them wh
 - **Code:** MIT License (see `LICENSE`). Anyone may use, copy and change it. The software is provided **"as is", without warranty**, and the authors are not liable for any claim or damages arising from its use.
 - **Unofficial:** EuroVote is not affiliated with the European Parliament or HowTheyVote.eu. Figures may contain errors (e.g. in the source data, the party list, or the "broke with majority" calculation). Check the official records before relying on them.
 - **Vote data:** © HowTheyVote.eu, made available under the [Open Database License (ODbL)](https://opendatacommons.org/licenses/odbl/). Every page and every exported image credits them. CSV exports are extracts of that database, so they fall under the ODbL too: whoever shares them must credit HowTheyVote.eu, and a changed version must be shared under the same license.
-- **MEP photos and party list:** come from the European Parliament's website and fall under [its copyright notice](https://www.europarl.europa.eu/legal-notice/en/), not under the MIT License.
+- **MEP photos and party data:** come from the European Parliament (its website and Open Data Portal) and fall under [its copyright notice](https://www.europarl.europa.eu/legal-notice/en/), not under the MIT License.
 

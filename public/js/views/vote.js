@@ -202,7 +202,7 @@ function renderFilterBar() {
     const map = new Map();
     for (const m of list) {
       const k = keyFn(m);
-      if (!map.has(k)) map.set(k, { value: k, label: labelFn(m), prefix: prefixFn(m), n: 0, search: m.country.label });
+      if (!map.has(k)) map.set(k, { value: k, label: labelFn(m), prefix: prefixFn(m), n: 0, search: `${m.country.label} ${m.partyShort || ''}` });
       map.get(k).n += 1;
     }
     // Keep already selected values visible even if they no longer match.
