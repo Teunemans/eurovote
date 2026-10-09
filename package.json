@@ -1,0 +1,15 @@
+{
+  "name": "eurovote",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Fast, readable breakdowns of European Parliament roll-call votes by country, political group and national party.",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "update-parties": "node scripts/update-parties.mjs"
+  }
+}

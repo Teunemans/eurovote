@@ -1,0 +1,68 @@
+# Publishes the site (the ./public folder) on GitHub Pages.
+#
+# Runs:
+#  - on every push to main (so your changes go live within a minute or two)
+#  - every day at 05:17 UTC, to refresh the national party list
+#  - by hand: Actions tab → "Deploy to GitHub Pages" → "Run workflow"
+#
+# One-time setup: repository Settings → Pages → Source: "GitHub Actions".
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write   # to commit the refreshed parties.json
+  pages: write      # to publish the site
+  id-token: write   # required by the Pages deploy action
+
+# Never run two deploys at the same time.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # If the EP site is down, this step fails (red cross) but the deploy continues
+      # with the parties.json that is already in the repository.
+      - name: Refresh national party list
+        id: parties
+        continue-on-error: true
+        run: node scripts/update-parties.mjs
+
+      - name: Commit the new party list (only if it changed)
+        run: |
+          if [ -n "$(git status --porcelain public/data/parties.json)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898732+github-actions[bot]@users.noreply.github.com"
+            git add public/data/parties.json
+            git commit -m "Update national party list"
+            git push
+          else
+            echo "Party list unchanged."
+          fi
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

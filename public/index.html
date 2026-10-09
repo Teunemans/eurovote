@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EuroVote</title>
+  <meta name="description" content="See how countries, political groups and national parties voted in the European Parliament. Clear charts you can download and share.">
+  <meta property="og:title" content="EuroVote">
+  <meta property="og:description" content="See how countries, political groups and national parties voted in the European Parliament.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/app.css">
+  <script>
+    // Apply the saved theme before the page is drawn, so there is no flash of the wrong colours.
+    try { if (localStorage.getItem('eurovote.theme') === 'dark') document.documentElement.dataset.theme = 'dark'; } catch (e) {}
+  </script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#/" aria-label="EuroVote home">
+        <svg viewBox="0 0 32 32" width="26" height="26" aria-hidden="true">
+          <rect x="3" y="7" width="26" height="5" rx="2.5" fill="var(--vote-for)"/>
+          <rect x="3" y="15" width="17" height="5" rx="2.5" fill="var(--vote-against)"/>
+          <rect x="3" y="23" width="9" height="5" rx="2.5" fill="var(--vote-abstain)"/>
+        </svg>
+        <span>EuroVote</span>
+      </a>
+      <form id="global-search" class="global-search" role="search">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input type="search" name="q" autocomplete="off" placeholder="Search votes, or paste a vote ID / MEPWatch link" aria-label="Search votes">
+        <kbd aria-hidden="true">/</kbd>
+      </form>
+      <button id="theme-toggle" class="theme-toggle" type="button" title="Light / dark mode (keyboard: gd)"></button>
+    </div>
+  </header>
+  <main id="app" class="container"></main>
+  <footer class="footer container">
+    Vote data: <a href="https://howtheyvote.eu" target="_blank" rel="noopener">HowTheyVote.eu</a> (open data from the European Parliament).
+    National parties: <a href="https://www.europarl.europa.eu/meps/en/full-list" target="_blank" rel="noopener">European Parliament MEP list</a>.
+    Vote data is © HowTheyVote.eu under the <a href="https://opendatacommons.org/licenses/odbl/" target="_blank" rel="noopener">Open Database License</a>; MEP photos © European Parliament.
+    <br>EuroVote is an unofficial tool, not affiliated with the European Parliament or HowTheyVote.eu. Figures may contain errors, so check the official records before relying on them. Provided “as is”, without any warranty (<a href="https://opensource.org/license/mit" target="_blank" rel="noopener">MIT License</a>).
+    <br>Keyboard: Vim-style keys. Press <kbd>?</kbd> for the full list.
+  </footer>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
